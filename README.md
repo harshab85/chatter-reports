@@ -31,7 +31,7 @@ Post Information : The following infomation are given for each post sumbited by 
 1. Date and time of submission
 2. The post message (along with the total number of posts for that date)
 3. The post type (Text, Mention, Comment)
-4. The number of links for that post
+4. The number of likes for that post
 5. The number of comments recieved by that post
 
 Logout : Will redirect to login page
