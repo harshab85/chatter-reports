@@ -5,7 +5,8 @@ Created By: Harsha Balasubramanian
 
 Application Overview
 --------------------
-This web application reports the chatter posts submitted/mentioned by a logged-in user on a given date.
+This web application reports the chatter posts submitted/mentioned by a logged-in user on a given date. The application 
+is running at https://chatterreport.cloudfoundry.com/Report
 
 
 Definition of a post
@@ -44,6 +45,30 @@ Logout : Invalidates the user's session and performs a soft login. Clearing the 
 prompt the user to provide the login credentials.
 
 
+Sample Users
+------------
+harshab85@gmail.com           qwerty123$ 
+
+sharanyaharsha@gmail.com      qwerty123$ 
+
+benkingtest@gmail.com         qwerty123$ 
+
+maxpaynetest@gmail.com        qwerty123$ 
+
+rogerbanner@gmail.com         qwerty123$
+
+chattertestuser100@gmail.com  qwerty123$ (Email for confirmation: chattertestuser@gmail.com)
+
+
+List of known issues
+--------------------
+
+1. Logout - The 'sid' cookie which needs to be removed for prompting the login page is not available in the request 
+context. This can be resolved by channging the application context path to / instead of /Report. Clearing the browser 
+cookies will alos prompt the user to login.
+
+2. Profile picture - The user's profile picture is display only when the user is logged-in though the dev community 
+page. This can be tested with harshab85@gmail.com/qwerty123$
 
 
 
