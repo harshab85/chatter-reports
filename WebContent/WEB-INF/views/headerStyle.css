@@ -1,0 +1,153 @@
+.header{
+	margin-bottom:10px;
+}
+
+.header a{
+	font-size:11px !important;	
+}
+
+.logo_punchline{
+	float:left;
+}
+
+.login_userdetails_and_links{
+	float:right;
+	margin-top:5px;
+	margin-right:5px;
+	font-size:12px;
+	line-height:22px;
+}
+
+.eBay_logo, .punchline{
+	float:left;
+}
+
+.punchline{
+	font-size:24px;
+	margin-top:10px;
+}
+
+.signout_link{
+	/*color:#666;*/
+	font-size:11px;
+	
+
+}
+.header_top{
+	padding-bottom:5px;	
+	padding-top:10px;
+}
+.header_bottom{
+	background:#fff url(../images/header_bottom_bg.jpg) top left repeat-x;
+	width:100%;
+	height:46px;
+	line-height:46px;
+	color:#1f55b7;
+}
+
+.create_exp{
+	background:url(../images/create_exp.gif) center left no-repeat;
+	padding-left:20px;
+	margin-left:10px;
+	font-size:11px;
+	float:left;
+	/*width:114px;*/
+	padding-right:5px;
+}
+
+.advanced_search{
+	line-height:10px;
+	/*font-size:11px;*/
+	margin-top:16px;
+	float:left;
+}
+
+.advanced_search input{
+	border:1px solid #cccccc;	
+}
+
+.advSrchTxt{
+	margin:0 5px;
+    padding-top: 3px;	
+    
+}
+
+.searchImg{
+  margin:0 5px;
+  cursor:pointer;
+}
+
+/*.advanced_search a{
+	color:#0f48b2;
+	text-decoration:none;
+}*/
+
+.my_menu{
+	float:right;
+	font-size:11px;
+	margin-right:10px;
+}
+
+.my_exp{
+	background:url(../images/my_exp.gif) center left no-repeat;
+	padding-left:18px;
+	
+}
+.dashBoard{
+	background:url(../images/dashBoardIcon.jpg) 0 1px no-repeat;
+	padding-left:20px;
+}
+.my_alert{
+	background:url(../images/my_alert.gif) center left no-repeat;
+	padding-left:15px;
+}
+.my_report{
+	background:url(../images/my_reports.gif) center left no-repeat;
+	padding-left:15px;
+}
+
+.help{
+	background:url(../images/HelpIcon.png) top left no-repeat;
+	padding-left:20px;
+}	
+
+.tools{
+	background:url(../images/GrarIcon.png) top left no-repeat;
+	padding-left:20px;
+	padding-bottom:2px;
+}	
+
+.mail{
+	position: relative;
+    top: 2px;	
+	padding-left:2px;
+}
+
+
+
+
+/*.testUser a{
+	font-size:11px !important;	
+}*/
+
+
+
+.user_details{
+	float:right;
+	font-size:11px;
+	line-height:15px;
+	margin-top:8px;
+	margin-right:5px;
+	
+}
+
+.user_details div{
+	float:left;
+	padding:0px 2px;
+
+}
+
+.exptUser{
+	/*color:#000;*/
+	margin-top: 5px;
+}
