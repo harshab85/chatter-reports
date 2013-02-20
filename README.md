@@ -5,7 +5,7 @@ Created By: Harsha Balasubramanian
 
 Application Overview
 --------------------
-This web application reports the chatter posts submitted by a logged-in user on a given date.
+This web application reports the chatter posts submitted/mentioned by a logged-in user on a given date.
 
 
 Definition of a post
@@ -15,6 +15,8 @@ A chatter post is assumed to be one of the following:
 2. User posts/comment on other's wall
 3. User posts/comment to groups
 4. User mentions others
+
+Simply put, all posts in the logged-in user's profile page are candidates for display
 
 Component Description
 ---------------------
@@ -31,7 +33,7 @@ Post Information : The following infomation are given for each post sumbited by 
 1. Date and time of submission
 2. The post message (along with the total number of posts for that date)
 3. The post type (Text, Mention, Comment)
-4. The number of links for that post
+4. The number of likes for that post
 5. The number of comments recieved by that post
 
 Logout : Will redirect to login page
