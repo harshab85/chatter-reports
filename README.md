@@ -11,10 +11,12 @@ This web application reports the chatter posts submitted/mentioned by a logged-i
 Definition of a post
 --------------------
 A chatter post is assumed to be one of the following:
-1. User post/comment on user's wall
-2. User posts/comment on other's wall
-3. User posts/comment to groups
-4. User mentions others
+1. User post on user's wall
+2. User posts on other's wall
+3. User posts to groups
+4. Comments (Shown in 'more details'. See below)
+5. User mentions to others
+6. User mentions recieved
 
 Simply put, all posts in the logged-in user's profile page are candidates for display
 
@@ -32,11 +34,14 @@ that date.
 Post Information : The following infomation are given for each post sumbited by the user
 1. Date and time of submission
 2. The post message (along with the total number of posts for that date)
-3. The post type (Text, Mention, Comment)
+3. The post type (Text, Mention)
 4. The number of likes for that post
 5. The number of comments recieved by that post
+6. More Details - Shows the complete post in a popup window. THis section contains the comments recieved for posts 
+and the comment posted by the user
 
-Logout : Will redirect to login page
+Logout : Invalidates the user's session and performs a soft login. Clearing the browser cookies will
+prompt the user to provide the login credentials.
 
 
 
