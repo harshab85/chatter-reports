@@ -13,6 +13,16 @@ import com.application.chatter.util.ApplicationUtil;
 import com.application.chatter.util.UserInfoUtil;
 import com.application.chatter.util.UserInfoUtil.UserProfileKeys;
 
+/**
+ * A basic implemetation of {@link IProfile}
+ * 
+ * <br>
+ * 
+ * Return a logged-in user's first name, last name and profile photo
+ * 
+ * @author hbalasubramanian
+ *
+ */
 public class SimpleProfile implements IProfile {
 
 	IApplicationInfo applicationInfo = null;
@@ -44,6 +54,12 @@ public class SimpleProfile implements IProfile {
 		return profileData;
 	}
 
+	/**
+	 * Creates a simple profile for the user
+	 * 
+	 * @throws IOException
+	 * @throws ParseException
+	 */
 	protected IProfileData createProfileData(JSONObject json) throws IOException, ParseException{
 		
 		ProfileInput profileInput = new ProfileInput();

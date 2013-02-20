@@ -25,7 +25,14 @@ import com.application.chatter.util.ApplicationUtil.SessionBeanKeys;
 import com.application.chatter.util.UserInfoUtil.UserInfoParams;
 
 /**
- * Servlet implementation class TestServlet
+ * The {@link ChatterReportServlet} uses OAuth to authenticate the user. Once the token is received, 
+ * it is stored in the session along with the server instance and identity service URLs to be re-used 
+ * for other requests.
+ * <br>
+ * After authenticating the user, the {@link FeedsReportGenerator} is used to retrieve the user profile and
+ * feeds information.
+ * <br>
+ * The feed information is stored as a request attribute and it is recreated for every request
  */
 @WebServlet(description = "Servlet to get chatter reports", urlPatterns = { "/TestServlet" })
 public class ChatterReportServlet extends HttpServlet {
@@ -46,7 +53,8 @@ public class ChatterReportServlet extends HttpServlet {
 		handleLogout(request, response);
 		
 		IApplicationInfo applicationInfo = null;
-		Object appSessionToken = request.getSession().getAttribute(SessionBeanKeys.APPLICATIONINFO.getKey());					
+		Object appSessionToken = request.getSession().getAttribute(SessionBeanKeys.APPLICATIONINFO.getKey());	
+		String date = request.getParameter(SessionBeanKeys.DATE.getKey());
 		RequestDispatcher errorDispatcher = getServletConfig().getServletContext().getRequestDispatcher(ApplicationUtil.ERROR_PATH);
 		
 		
@@ -57,7 +65,7 @@ public class ChatterReportServlet extends HttpServlet {
 			try{
 				IAuthenticate authenticator = OAuthUserAuthenticator.getInstance();
 				applicationInfo = authenticator.authenticate(request, response);				
-				
+								
 				if(applicationInfo == null || applicationInfo.getToken() == null || !applicationInfo.getToken().isAuthenticated()){
 					return;
 				}				
@@ -78,9 +86,10 @@ public class ChatterReportServlet extends HttpServlet {
 			String feedType = request.getParameter(UserInfoParams.FEEDTYPE.getUserInfoParamName());
 			String profileType = request.getParameter(UserInfoParams.PROFILETYPE.getUserInfoParamName());
 			feedsReport = FeedsReportGenerator.getReport(applicationInfo, profileType, feedType);
-						
+			
 			request.getSession().setAttribute(SessionBeanKeys.APPLICATIONINFO.getKey(), applicationInfo);
 			request.setAttribute(SessionBeanKeys.FEEDSREPORT.getKey(), feedsReport);			
+			request.setAttribute(SessionBeanKeys.DATE.getKey(), date);							
 			
 			RequestDispatcher reqDispatcher = getServletConfig().getServletContext().getRequestDispatcher(ApplicationUtil.JSP_PATH);			
 			reqDispatcher.forward(request, response);
@@ -99,10 +108,13 @@ public class ChatterReportServlet extends HttpServlet {
 		}
 	}
 
+	/**
+	 * Logs out the current user by removing the 'sid' cookie and invalidating the session 
+	 */
 	private void handleLogout(HttpServletRequest request, HttpServletResponse response) {
 		
 		Object logout = request.getParameter(RequestParams.LOGOUT.getParamName());
-		
+
 		if(logout != null){			
 			Cookie[] cookies = request.getCookies();
 			for(Cookie cookie: cookies){
@@ -123,7 +135,7 @@ public class ChatterReportServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {							
 	}
 
 }

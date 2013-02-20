@@ -16,12 +16,27 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.application.chatter.reports.MissingInputException;
+
+/**
+ * 
+ * 
+ * @author hbalasubramanian
+ *
+ */
 public final class ApplicationUtil {
 
 	public static final String JSP_PATH = "/WEB-INF/views/ChatterReporter.jsp";
 	public static final String PATH = "/ChatterReports/Report";
 	public static final String ERROR_PATH = "/WEB-INF/views/Error.jsp";
 	
+	/**
+	 * 
+	 * Enum to store keys that will be stored in the request's session
+	 * 
+	 * @author hbalasubramanian
+	 *
+	 */		
 	public static enum SessionBeanKeys{
 		
 		AUTHTOKEN("AUTHTOKEN"), FEEDSREPORT("FEEDSREPORT"), DATE("DATE"),
@@ -39,6 +54,12 @@ public final class ApplicationUtil {
 		
 	}
 	
+	/**
+	 * Enum to store keys that will be used in the request parameters
+	 * 
+	 * @author hbalasubramanian
+	 *
+	 */
 	public static enum RequestParams{
 		
 		LOGOUT("LOGOUT"), ERROR("ERROR");
@@ -54,10 +75,20 @@ public final class ApplicationUtil {
 		}
 	}
 	
+	/**
+	 * Retrieve the full stack trace from an exception without a default message
+	 * 
+	 * @param throwable	
+	 */
 	public static String getErrorMessage(Throwable throwable) {
 		return getErrorMessage("", throwable);
 	}
 	
+	/**
+	 * Retrieve the full stack trace from an exception with a default message
+	 * 
+	 * @param throwable	
+	 */
 	public static String getErrorMessage(String msg, Throwable throwable) {
 		if (throwable == null) {
 			return "Unknown Error";
@@ -73,6 +104,11 @@ public final class ApplicationUtil {
 		return message;
 	}
 	
+	/**
+	 * Reads proerty files and return a corresponding {@link Properties} instance
+	 * 
+	 * @throws IOException
+	 */
 	public static Properties readApplicationProperties(String propertyFileName) throws IOException{
 		
 		Properties properties = new Properties();
@@ -96,6 +132,11 @@ public final class ApplicationUtil {
 		return properties;
 	}
 	
+	/**
+	 * Encodes a returna given raw string
+	 * 
+	 * @throws UnsupportedEncodingException
+	 */
 	public static String encode(String rawString) throws UnsupportedEncodingException{
 		
 		if(rawString == null || rawString.isEmpty()){
@@ -105,8 +146,19 @@ public final class ApplicationUtil {
 		return URLEncoder.encode(rawString, "UTF-8");
 	}
 	
-	public static JSONObject getJSONResponse(URLConnection urlConnection) throws IOException, ParseException{
+	/**
+	 * Return the JSON response for the given connection
+	 * 
+	 * @throws IOException
+	 * @throws ParseException
+	 * @throws MissingInputException 
+	 */
+	public static JSONObject getJSONResponse(URLConnection urlConnection) throws IOException, ParseException, MissingInputException{
 				
+		if(urlConnection == null){
+			throw new MissingInputException("Unable to get the JSON response");
+		}
+		
 		BufferedReader in = null;
 		StringBuffer inputLine = new StringBuffer();
 		try{
@@ -129,7 +181,20 @@ public final class ApplicationUtil {
 		return json;
 	}
 	
-	public static JSONObject getJSONResponse(String urlString) throws IOException, ParseException{
+	
+	/**
+	 * Return the JSON response for the given URL
+	 * 
+	 * @throws IOException
+	 * @throws ParseException
+	 * @throws MissingInputException 
+	 */
+	public static JSONObject getJSONResponse(String urlString) throws IOException, ParseException, MissingInputException{
+		
+		if(urlString == null || urlString.isEmpty()){
+			throw new MissingInputException("Unable to get the JSON response");
+		}
+		
 		URL url = new URL(urlString);		
 		URLConnection conn = url.openConnection();
 		return getJSONResponse(conn);

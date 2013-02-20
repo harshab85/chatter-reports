@@ -13,6 +13,11 @@ public final class AuthenticationUtil {
 	
 	public static final String URL_PARAM_BEGIN_DELIMITER = "?";
 	
+	/**
+	 * Reads the OAuth properties file for user authentication
+	 * 
+	 * @throws AuthenticationException
+	 */
 	public static Properties readAuthProperties() throws AuthenticationException{
 		try {
 			return ApplicationUtil.readApplicationProperties(AUTH_PROPERTY_FILE_NAME);
@@ -22,6 +27,12 @@ public final class AuthenticationUtil {
 		}
 	}
 	
+	/**
+	 * Enum to store the authentication request/response parameters
+	 * 
+	 * @author hbalasubramanian
+	 *
+	 */
 	public enum AuthenticationParams{
 		
 		CODE("code"), ACCESSTOKEN("access_token"), INSTANCE_URL("instance_url"), IDENTITY_SERVICE("id");
@@ -37,6 +48,12 @@ public final class AuthenticationUtil {
 		}
 	}
 	
+	/**
+	 * Enum to store all the keys in the OAuth properties file
+	 * 
+	 * @author hbalasubramanian
+	 *
+	 */
 	public enum AuthPropertyFileKeys{
 		
 		AUTHENTICATION_URL("AUTHENTICATION_URL"), RESPONSE_TYPE("RESPONSE_TYPE"),

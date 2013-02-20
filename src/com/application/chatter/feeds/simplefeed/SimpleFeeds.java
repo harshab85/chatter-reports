@@ -1,7 +1,5 @@
 package com.application.chatter.feeds.simplefeed;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,7 +18,24 @@ import com.application.chatter.feeds.FeedException;
 import com.application.chatter.feeds.IFeeds;
 import com.application.chatter.util.ApplicationUtil;
 import com.application.chatter.util.UserInfoUtil;
+import com.application.chatter.util.UserInfoUtil.UserFeedsKeys;
 
+/**
+ * A basic implementation of {@link IFeedData}
+ * 
+ * <br>
+ * 
+ * Returns the following information about the current user's feeds
+ * <ol>
+ * <li> Creation Date
+ * <li> Post (Total per day)
+ * <li> Type of feed
+ * <li> Likes
+ * <li> Number of comments for each feed
+ * 
+ * @author hbalasubramanian
+ *
+ */
 public class SimpleFeeds implements IFeeds {
 
 	IApplicationInfo applicationInfo = null;
@@ -54,7 +69,7 @@ public class SimpleFeeds implements IFeeds {
 		
 		return feedData;		
 	}
-
+	
 	protected IFeedData createFeedData(JSONObject json) {
 
 		Map<String, List<Feed>> userFeeds = createUserFeeds(json); 
@@ -63,36 +78,41 @@ public class SimpleFeeds implements IFeeds {
 		return feedData;
 	}
 
+	/**
+	 * Creates simple feeds as a {@link LinkedHashMap} to maintain order by 
+	 * creation date
+	 * 
+	 */
 	protected Map<String, List<Feed>> createUserFeeds(JSONObject json) {
 		
 		Map<String, List<Feed>> feeds = new LinkedHashMap<String, List<Feed>>();
 		
-		JSONArray items = (JSONArray)json.get("items");
+		JSONArray items = (JSONArray)json.get(UserFeedsKeys.ITEMS.getKey());
 		
 		Iterator<JSONObject> iter = items.iterator();
 		while(iter.hasNext()){
 			JSONObject item = iter.next();			
-			JSONObject body = (JSONObject)item.get("body");
-			JSONArray messageSegments = (JSONArray)body.get("messageSegments");
+			JSONObject body = (JSONObject)item.get(UserFeedsKeys.BODY.getKey());
+			JSONArray messageSegments = (JSONArray)body.get(UserFeedsKeys.MESSAGESEGMENTS.getKey());
 				
 			Iterator<JSONObject> ms = messageSegments.iterator();
 			String type = null;
 			while(ms.hasNext()){
 				JSONObject segment = ms.next();
-				type = (String)segment.get("type");
+				type = (String)segment.get(UserFeedsKeys.TYPE.getKey());
 				if(type != null){
 					break;
 				}
 			}
 											
-			String post = (String)body.get("text");			
-			String date = (String)item.get("createdDate");
+			String post = (String)body.get(UserFeedsKeys.TEXT.getKey());			
+			String date = (String)item.get(UserFeedsKeys.CREATEDDATE.getKey());
 						
-			JSONObject comments = (JSONObject)item.get("comments");
-			Long numComments = (Long)comments.get("total");
+			JSONObject comments = (JSONObject)item.get(UserFeedsKeys.COMMENTS.getKey());
+			Long numComments = (Long)comments.get(UserFeedsKeys.TOTAL.getKey());
 			
-			JSONObject likes = (JSONObject)item.get("likes");
-			Long numLikes = (Long)likes.get("total");
+			JSONObject likes = (JSONObject)item.get(UserFeedsKeys.LIKES.getKey());
+			Long numLikes = (Long)likes.get(UserFeedsKeys.TOTAL.getKey());
 			
 			Calendar calendar = DatatypeConverter.parseDateTime(date);
 			Date createdDate = calendar.getTime();
@@ -104,7 +124,7 @@ public class SimpleFeeds implements IFeeds {
 			feed.setNumComments(numComments);
 			feed.setLikes(numLikes);
 			
-			String dateKey = createDateKey(createdDate);
+			String dateKey = UserInfoUtil.createUserFeedsDateKey(createdDate);
 			List<Feed> feedsList = feeds.get(dateKey);
 			if(feedsList == null){
 				feedsList = new ArrayList<Feed>();
@@ -113,15 +133,9 @@ public class SimpleFeeds implements IFeeds {
 			feedsList.add(feed);
 			feeds.put(dateKey, feedsList);			
 		}
+		
 		return feeds;
 	}
-
-	protected String createDateKey(Date createdDate) {		
-		DateFormat df = new SimpleDateFormat("MMM dd yyyy");
-		String dateKey = df.format(createdDate);		
-		return dateKey;
-	}
-
 }
 
 

@@ -17,17 +17,38 @@ import com.application.chatter.util.AuthenticationUtil;
 import com.application.chatter.util.AuthenticationUtil.AuthPropertyFileKeys;
 import com.application.chatter.util.AuthenticationUtil.AuthenticationParams;
 
+/**
+ * An implementation of {@link IAuthenticate} which authenticates the current user using OAuth 2.0
+ * 
+ * <br>
+ * The object of this class is a Singleton since the properties required to authenticate users 
+ * need to be read and initialized only once
+ * 
+ * @author hbalasubramanian
+ *
+ */
 public class OAuthUserAuthenticator implements IAuthenticate {
 
-	private static OAuthUserAuthenticator authenticator = new OAuthUserAuthenticator();
+	private static OAuthUserAuthenticator authenticator = null;
 	
 	private OAuthProperties oAuthProperties = null;
 	
 	private IApplicationInfo applicationInfo = null;
 	
-	private OAuthUserAuthenticator(){		
+	private OAuthUserAuthenticator() throws AuthenticationException{				
+		
+		if(oAuthProperties == null){			
+			Properties properties = AuthenticationUtil.readAuthProperties();
+			oAuthProperties = new OAuthProperties(properties);
+		}
 	}
 
+	/**
+	 * Utility class for storing the OAuth properties
+	 * 
+	 * @author hbalasubramanian
+	 *
+	 */
 	class OAuthProperties{
 		
 		private Properties oAuthProperties = null;
@@ -74,26 +95,38 @@ public class OAuthUserAuthenticator implements IAuthenticate {
 	}
 	
 	/**
-	 * 
+	 * Double locked Singleton instance
 	 * 
 	 * @return
 	 * @throws AuthenticationException 
 	 * @throws IOException 
 	 */
-	public static final OAuthUserAuthenticator getInstance(){		
+	public static final OAuthUserAuthenticator getInstance() throws AuthenticationException{		
+		if(authenticator == null){			
+			synchronized (OAuthUserAuthenticator.class) {
+				if(authenticator == null){
+					authenticator = new OAuthUserAuthenticator();
+				}
+			}			
+		}
+		
 		return authenticator;
 	}
 
-
+	/**
+	 * This method is called ONLY once during user authentication. 
+	 * 
+	 * <br><br>
+	 * 
+	 * <b>First Invocation</b> - Client code is null. Redirect client to Authentication URL
+	 * <br>
+	 * <b>Second Invocation</b> - Client code is present. Invoke the authorization URL using the code and client secret.
+	 * <br>
+	 * Get the access token from the response payload on success
+	 */
 	@Override
 	public IApplicationInfo authenticate(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException{
 	
-		if(oAuthProperties == null){
-			Properties properties  = AuthenticationUtil.readAuthProperties();
-			oAuthProperties = new OAuthProperties(properties);
-		}
-		
-		
 		String code = request.getParameter(AuthenticationParams.CODE.getParamName());		
 		try{
 			if(code == null || code.isEmpty()){				
@@ -137,6 +170,9 @@ public class OAuthUserAuthenticator implements IAuthenticate {
 		return applicationInfo;
 	}
 
+	/**
+	 * Constructs the Authorization URL
+	 */
 	protected String getAuthorizationURL(String code) throws UnsupportedEncodingException{
 		
 		StringBuilder authorizationUrl = new StringBuilder();
@@ -167,6 +203,9 @@ public class OAuthUserAuthenticator implements IAuthenticate {
 		return authorizationUrl.toString();
 	}
 	
+	/**
+	 * Constructs the Authentication URL
+	 */
 	protected String getAuthenticationURL() throws UnsupportedEncodingException {
 		
 		StringBuilder authenticationUrl = new StringBuilder();

@@ -1,3 +1,7 @@
+
+<%@page import="com.application.chatter.util.ApplicationUtil"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+
 <%@page import="com.application.chatter.reports.ChatterFeedsReport"%>
 <%@page import="com.application.chatter.util.ApplicationUtil.SessionBeanKeys"%>
 <%@page import="java.util.Iterator"%>
@@ -7,9 +11,10 @@
 <%@page import="java.util.Map"%>
 <%@page import="com.application.chatter.feeds.IFeeds.IFeedData"%>
 <%@page import="java.net.URL"%>
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ page import="com.application.chatter.profile.IProfile.IProfileData" %>
 <%@ page import="com.application.chatter.authentication.IAuthenticate.IToken" %>
+
+<%@ page errorPage="/Error.jsp" %>
 
 <html>
 	
@@ -17,6 +22,26 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 		<title>Chatter Reports</title>
 		
+		<script>
+			function postDate(path, dateKey){
+				var selectedDateFields = document.getElementById("select");
+				var dateValue = selectedDateFields.options[selectedDateFields.selectedIndex].text;
+
+				var form = document.createElement("form");
+			    form.setAttribute("method", "GET");
+			    form.setAttribute("action", path);
+			    
+			    var hiddenField = document.createElement("input");
+	            hiddenField.setAttribute("type", "hidden");
+			    hiddenField.setAttribute("name", dateKey);
+			    hiddenField.setAttribute("value", dateValue);
+			    
+			    form.appendChild(hiddenField);
+			    document.body.appendChild(form);
+			    
+			    form.submit();
+			}
+		</script>
 				
 	</head>
 
@@ -27,22 +52,28 @@
 		URL thumbnail = null;
 		Map<String, List<Feed>> userFeeds = null;
 		Set<String> dates = null;
+		String selectedDate = null;
 		
-		try{
-			ChatterFeedsReport feedsReport = (ChatterFeedsReport)request.getAttribute(SessionBeanKeys.FEEDSREPORT.getKey());
+		ChatterFeedsReport feedsReport = (ChatterFeedsReport)request.getAttribute(SessionBeanKeys.FEEDSREPORT.getKey());
 		
-			IProfileData profileData = feedsReport.getProfileData();
-			IFeedData feeds = feedsReport.getFeedsData();
+		IProfileData profileData = feedsReport.getProfileData();
+		IFeedData feeds = feedsReport.getFeedsData();
 			
-			firstName = profileData.getFirstName();
-			lastName = profileData.getLastName();
-			photo = profileData.getPhotoURL();
-			thumbnail = profileData.getThumbnailURL();
-			userFeeds = feeds.getUserFeeds();													
+		firstName = profileData.getFirstName();
+		lastName = profileData.getLastName();
+		photo = profileData.getPhotoURL();
+		thumbnail = profileData.getThumbnailURL();
+		userFeeds = feeds.getUserFeeds();	
+		
+		selectedDate = (String)request.getAttribute(SessionBeanKeys.DATE.getKey());
+		dates = userFeeds.keySet();
+				
+		if(selectedDate == null || selectedDate.isEmpty()){
+			selectedDate  = dates.iterator().next();			
 		}
-		catch(Exception e){
 			
-		}
+		List<Feed> feedList = userFeeds.get(selectedDate);
+		
 	%>
 
 	<body>
@@ -67,15 +98,14 @@
 		<table width=100% style="background-color:#E0E0E0;">
 			<tr>
 				<td width="90%">View Posts On &nbsp | &nbsp 
-					<select id="select" name="" style="width: 115px;"> 
+					<select id="select" name="dates" style="width: 115px;" onchange="postDate('/ChatterReports/Report','DATE')"> 
 						
-						<% 
-							dates = userFeeds.keySet();
+						<% 							
 							Iterator<String> datesItererator = dates.iterator();
 							while(datesItererator.hasNext()){
 								String date = datesItererator.next();
 						%>
-								<option id="Date" value="Date" title="Date" onclick="reloadReport()"><%out.print(date);%></option>
+								<option id="Date" <%if(date.equals(selectedDate)) out.print("selected=selected"); %>value="Date" title="Date" onclick="reloadReport()"><%out.print(date);%></option>
 						<%
 							}
 						%>
@@ -96,23 +126,17 @@
 		<table width="100%">
 			<tr style="background-color:#629edc;font-size:20px">
 				<td><b>Date</b></td>
-				<td><b>Posts (Total: 30)</b></td>
+				<td><b>Posts (Total: <%out.print(feedList.size()); %>)</b></td>
 				<td><b>Type</b></td>
 				<td><b>Likes </b></td>
 				<td><b>Comments</b></td>
 			</tr>	
 			<% 
-				if(dates != null && !dates.isEmpty()){
-			
-					String selectedDate = (String)request.getAttribute(SessionBeanKeys.DATE.getKey());
-					if(selectedDate == null || selectedDate.isEmpty()){
-						selectedDate  = dates.iterator().next();			
-					}
-					
-					List<Feed> feedList = userFeeds.get(selectedDate);
+				if(feedList != null && !feedList.isEmpty()){
+													
 					Iterator<Feed> feedsItererator = feedList.iterator();
 					int i=0;
-					while(feedsItererator.hasNext()){
+					while(feedsItererator.hasNext()){						
 						Feed feed = feedsItererator.next();
 						if(i%2 == 0){
 			%>
@@ -124,6 +148,7 @@
 							<tr style="background-color:#ffffff;font-size:20px">
 						<%
 						}
+						i++;
 						%>
 							
 							<td><%out.print(feed.getCreationDate());%></td>
@@ -144,6 +169,6 @@
 				}
 			%>		
 			
-	</table>
-</body>	
+		</table>
+	</body>	
 </html>

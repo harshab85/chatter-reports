@@ -9,4 +9,9 @@
     <servlet-name>Report</servlet-name>
     <url-pattern>/Report</url-pattern>
   </servlet-mapping>
+  
+  <error-page>
+  	<exception-type>Exception</exception-type>
+  	<location>/Error.jsp</location>
+</error-page>
 </web-app>

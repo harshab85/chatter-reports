@@ -3,6 +3,13 @@ package com.application.chatter.profile;
 import java.net.URL;
 import java.util.List;
 
+/**
+ * 
+ * An interface to store the user's profile information
+ * 
+ * @author hbalasubramanian
+ *
+ */
 public interface IProfile {
 
 	interface IProfileData{
@@ -24,5 +31,10 @@ public interface IProfile {
 		public List<String> getFeedItems();
 	}
 	
+	/**
+	 * Returns the current user's profile data
+	 * 
+	 * @return
+	 */
 	public IProfileData getProfile() throws ProfileReadException;
 }
