@@ -22,7 +22,14 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 		<title>Chatter Reports</title>
 		
-		<script>
+		<script>	
+			
+			function showFullPost(post){
+				var message = 'Full Post \n\n' + post;
+				alert(message);
+			}
+		
+		
 			function postDate(path, dateKey){
 				var selectedDateFields = document.getElementById("select");
 				var dateValue = selectedDateFields.options[selectedDateFields.selectedIndex].text;
@@ -128,8 +135,9 @@
 				<td><b>Date</b></td>
 				<td><b>Posts (Total: <%out.print(feedList.size()); %>)</b></td>
 				<td><b>Type</b></td>
-				<td><b>Likes </b></td>
-				<td><b>Comments</b></td>
+				<td><b>N Likes </b></td>
+				<td><b>N Comments</b></td>				
+				<td></td>
 			</tr>	
 			<% 
 				if(feedList != null && !feedList.isEmpty()){
@@ -155,7 +163,10 @@
 							<td><%out.print(feed.getPost());%></td>
 							<td><%out.print(feed.getType());%></td>
 							<td><%out.print(feed.getLikes());%></td>
-							<td><%out.print(feed.getNumComments());%></td>
+							<td><% out.print(feed.getNumComments()); %></td>
+							<td>
+								<a href="javascript:showFullPost('<%out.print(feed.getFullPost());%>')">More Details</a>
+							</td>
 						</tr>
 			<%
 					}

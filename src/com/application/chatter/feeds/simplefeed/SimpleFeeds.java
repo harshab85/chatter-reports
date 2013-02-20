@@ -107,9 +107,11 @@ public class SimpleFeeds implements IFeeds {
 											
 			String post = (String)body.get(UserFeedsKeys.TEXT.getKey());			
 			String date = (String)item.get(UserFeedsKeys.CREATEDDATE.getKey());
-						
+														
 			JSONObject comments = (JSONObject)item.get(UserFeedsKeys.COMMENTS.getKey());
 			Long numComments = (Long)comments.get(UserFeedsKeys.TOTAL.getKey());
+			
+			List<Feed> commentsList = createComments(comments);
 			
 			JSONObject likes = (JSONObject)item.get(UserFeedsKeys.LIKES.getKey());
 			Long numLikes = (Long)likes.get(UserFeedsKeys.TOTAL.getKey());
@@ -123,7 +125,10 @@ public class SimpleFeeds implements IFeeds {
 			feed.setCreationDate(createdDate);
 			feed.setNumComments(numComments);
 			feed.setLikes(numLikes);
-			
+			feed.setComments(commentsList);
+								
+			createFullPost(feed);
+						
 			String dateKey = UserInfoUtil.createUserFeedsDateKey(createdDate);
 			List<Feed> feedsList = feeds.get(dateKey);
 			if(feedsList == null){
@@ -135,6 +140,56 @@ public class SimpleFeeds implements IFeeds {
 		}
 		
 		return feeds;
+	}
+
+	protected void createFullPost(Feed feed){
+		String post = feed.getPost();
+		List<Feed> comments = feed.getComments();
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(post);		
+		
+		for(Feed comment: comments){
+			sb.append("\n");
+			sb.append(comment.getPost());
+		}
+		
+		feed.setFullPost(sb.toString());
+	}
+	
+	protected List<Feed> createComments(JSONObject comments) {
+		
+		List<Feed> feedsList = new ArrayList<Feed>();
+		
+		JSONArray commentsArray = (JSONArray)comments.get("comments");
+		
+		Iterator<JSONObject> iter = commentsArray.iterator();
+		
+		while(iter.hasNext()){
+		
+			JSONObject json = iter.next();
+			
+			JSONObject body = (JSONObject)json.get(UserFeedsKeys.BODY.getKey());		
+			String post = (String)body.get(UserFeedsKeys.TEXT.getKey());
+			
+			String date = (String)json.get(UserFeedsKeys.CREATEDDATE.getKey());
+			Calendar calendar = DatatypeConverter.parseDateTime(date);
+			Date createdDate = calendar.getTime();
+			
+			Feed feed = new Feed();
+			feed.setPost(post);
+			feed.setType("Comment");
+			feed.setCreationDate(createdDate);		
+			feed.setLikes(0L);
+			feed.setNumComments(0L);
+			
+			feedsList.add(feed);
+		}
+		
+		
+		
+		
+		return feedsList;
 	}
 }
 

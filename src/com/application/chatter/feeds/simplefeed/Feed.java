@@ -1,7 +1,15 @@
 package com.application.chatter.feeds.simplefeed;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+/**
+ * Bean to store the feed data
+ * 
+ * @author hbalasubramanian
+ *
+ */
 public class Feed {
 
 	private Date creationDate = null;
@@ -14,12 +22,33 @@ public class Feed {
 	
 	private Long numComments = null;
 
+	private List<Feed> comments = new ArrayList<Feed>();
+	
+	private String fullPost = null;
+	
+	public List<Feed> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<Feed> comments) {
+		this.comments = comments;
+	}
+
+	
 	public Date getCreationDate() {
 		return creationDate;
 	}
 
 	public void setCreationDate(Date creationDate) {
 		this.creationDate = creationDate;
+	}
+	
+	public String getFullPost() {
+		return fullPost;
+	}
+
+	public void setFullPost(String fullPost) {
+		this.fullPost = fullPost;
 	}
 
 	public String getPost() {
@@ -70,8 +99,11 @@ public class Feed {
 		sb.append(" LIKES: ");
 		sb.append(this.numLikes);
 		
-		sb.append(" COMMENTS: ");
+		sb.append(" NUM COMMENTS: ");
 		sb.append(this.numComments);
+		
+		sb.append(" COMMENTS: ");
+		sb.append(this.comments.toString());
 		
 		return sb.toString();
 	}
