@@ -25,8 +25,13 @@ public class FeedsReportGenerator {
 	 * 
 	 * @throws ProfileReadException
 	 * @throws FeedException
+	 * @throws ReportException 
 	 */
-	public static ChatterFeedsReport getReport(IApplicationInfo applicationInfo, String profileType, String feedType) throws ProfileReadException, FeedException{
+	public static ChatterFeedsReport getReport(IApplicationInfo applicationInfo, String profileType, String feedType) throws ProfileReadException, FeedException, ReportException{
+		
+		if(applicationInfo == null){
+			throw new ReportException("Unable to generate report. Application data is missing");
+		}
 		
 		IProfileData profileData = ProfileFactory.getFactory().getProfile(applicationInfo, profileType);		
 		IFeedData feedData =  FeedsFactory.getFactory().getFeeds(applicationInfo, feedType);

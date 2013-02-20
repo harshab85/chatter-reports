@@ -9,6 +9,7 @@ import org.json.simple.parser.ParseException;
 import com.application.chatter.applicationinfo.IApplicationInfo;
 import com.application.chatter.profile.IProfile;
 import com.application.chatter.profile.ProfileReadException;
+import com.application.chatter.reports.MissingInputException;
 import com.application.chatter.util.ApplicationUtil;
 import com.application.chatter.util.UserInfoUtil;
 import com.application.chatter.util.UserInfoUtil.UserProfileKeys;
@@ -40,12 +41,7 @@ public class SimpleProfile implements IProfile {
 			String identityService = applicationInfo.getIdentityServiceURL();
 							
 			JSONObject json = UserInfoUtil.getJSONResponse(identityService, applicationInfo.getToken().getValue());
-			if(json != null){
-				profileData = createProfileData(json);
-			}
-			else{
-				throw new Exception("Unable to read the profile information");
-			}
+			profileData = createProfileData(json);			
 		}
 		catch (Exception e) {
 			throw new ProfileReadException(ApplicationUtil.getErrorMessage(e));
@@ -60,21 +56,47 @@ public class SimpleProfile implements IProfile {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	protected IProfileData createProfileData(JSONObject json) throws IOException, ParseException{
+	protected IProfileData createProfileData(JSONObject json) throws IOException, ParseException, MissingInputException{
+		
+		if(json == null){
+			throw new MissingInputException("Unable to read the profile information");
+		}
 		
 		ProfileInput profileInput = new ProfileInput();
-		profileInput.setFirstName((String)json.get(UserProfileKeys.FIRST_NAME.getKey()));
-		profileInput.setLastName((String)json.get(UserProfileKeys.LAST_NAME.getKey()));
+		
+		Object fName = json.get(UserProfileKeys.FIRST_NAME.getKey());
+		if(fName instanceof String){
+			profileInput.setFirstName((String)fName);
+		}
+		
+		Object lName = json.get(UserProfileKeys.LAST_NAME.getKey());
+		if(lName instanceof String){
+			profileInput.setLastName((String)lName);
+		}
 	
-		JSONObject photos = (JSONObject)json.get(UserProfileKeys.PHOTOS.getKey());
+		Object jPhotos = json.get(UserProfileKeys.PHOTOS.getKey());
+		JSONObject photos = null;
+		if(jPhotos instanceof JSONObject){
+			photos = (JSONObject)jPhotos;
+		}
 		
-		String pictureURLString = (String)photos.get(UserProfileKeys.PICTURE.getKey());
-		URL pictureURL = new URL(pictureURLString);
-		profileInput.setPhotoURL(pictureURL);
+		if(photos != null){			
+			Object picture = photos.get(UserProfileKeys.PICTURE.getKey());
+			if(picture instanceof String){
+				String pictureURLString = (String)picture;
+				URL pictureURL = new URL(pictureURLString);
+				profileInput.setPhotoURL(pictureURL);
+			}
+		}
 		
-		String thumbnailURLString = (String)photos.get(UserProfileKeys.THUMBNAIL.getKey());
-		URL thumbnailURL = new URL(thumbnailURLString);
-		profileInput.setThumbnail(thumbnailURL);
+		if(photos != null){
+			Object thumbnail = photos.get(UserProfileKeys.THUMBNAIL.getKey());
+			if(thumbnail instanceof String){
+				String thumbnailURLString = (String)thumbnail;
+				URL thumbnailURL = new URL(thumbnailURLString);
+				profileInput.setThumbnail(thumbnailURL);
+			}
+		}
 		
 		IProfileData profileData = new SimpleProfileBean(profileInput);
 		return profileData;

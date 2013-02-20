@@ -129,8 +129,14 @@ public final class UserInfoUtil {
 	 * Utility method to create a unique data key for the user feeds
 	 * 
 	 * @return
+	 * @throws MissingInputException 
 	 */
-	public static String createUserFeedsDateKey(Date createdDate) {		
+	public static String createUserFeedsDateKey(Date createdDate) throws MissingInputException {
+		
+		if(createdDate == null){
+			throw new MissingInputException("Missing input to create a date key");
+		}
+		
 		DateFormat df = new SimpleDateFormat(UserInfoUtil.DATEKEY_FORMAT);
 		String dateKey = df.format(createdDate);		
 		return dateKey;

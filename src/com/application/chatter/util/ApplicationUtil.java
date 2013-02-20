@@ -27,7 +27,7 @@ import com.application.chatter.reports.MissingInputException;
 public final class ApplicationUtil {
 
 	public static final String JSP_PATH = "/WEB-INF/views/ChatterReporter.jsp";
-	public static final String PATH = "/ChatterReports/Report";
+	public static final String PATH = "/Report";
 	public static final String ERROR_PATH = "/WEB-INF/views/Error.jsp";
 	
 	/**
@@ -81,6 +81,10 @@ public final class ApplicationUtil {
 	 * @param throwable	
 	 */
 	public static String getErrorMessage(Throwable throwable) {
+		if(throwable == null){
+			return "Unknown Error";
+		}
+		
 		return getErrorMessage("", throwable);
 	}
 	
@@ -90,18 +94,24 @@ public final class ApplicationUtil {
 	 * @param throwable	
 	 */
 	public static String getErrorMessage(String msg, Throwable throwable) {
+		
+		StringBuilder sb = new StringBuilder();
+		
 		if (throwable == null) {
-			return "Unknown Error";
+			sb.append("Unknown Error");
 		}
-
-		String message = msg + throwable.getMessage();
-
-		StringWriter stringWriter = new StringWriter();
-		PrintWriter printWriter = new PrintWriter(stringWriter);
-		throwable.printStackTrace(printWriter);
-		message = stringWriter.toString();
-
-		return message;
+		else{
+			if(msg != null){
+				sb.append(msg);
+				sb.append("\n");
+			}
+	
+			StringWriter stringWriter = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(stringWriter);
+			throwable.printStackTrace(printWriter);
+			sb.append(stringWriter.toString());			
+		}
+		return sb.toString();
 	}
 	
 	/**

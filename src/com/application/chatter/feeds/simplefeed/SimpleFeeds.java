@@ -16,6 +16,7 @@ import org.json.simple.JSONObject;
 import com.application.chatter.applicationinfo.IApplicationInfo;
 import com.application.chatter.feeds.FeedException;
 import com.application.chatter.feeds.IFeeds;
+import com.application.chatter.reports.MissingInputException;
 import com.application.chatter.util.ApplicationUtil;
 import com.application.chatter.util.UserInfoUtil;
 import com.application.chatter.util.UserInfoUtil.UserFeedsKeys;
@@ -129,7 +130,14 @@ public class SimpleFeeds implements IFeeds {
 								
 			createFullPost(feed);
 						
-			String dateKey = UserInfoUtil.createUserFeedsDateKey(createdDate);
+			String dateKey = "";
+			try {
+				dateKey = UserInfoUtil.createUserFeedsDateKey(createdDate);
+			} 
+			catch (MissingInputException e) {
+				// TODO should log the error
+				continue;
+			}
 			List<Feed> feedsList = feeds.get(dateKey);
 			if(feedsList == null){
 				feedsList = new ArrayList<Feed>();
@@ -150,7 +158,7 @@ public class SimpleFeeds implements IFeeds {
 		sb.append(post);		
 		
 		for(Feed comment: comments){
-			sb.append("\n");
+			sb.append("\n\r");
 			sb.append(comment.getPost());
 		}
 		

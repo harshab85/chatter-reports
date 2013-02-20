@@ -105,7 +105,7 @@
 		<table width=100% style="background-color:#E0E0E0;">
 			<tr>
 				<td width="90%">View Posts On &nbsp | &nbsp 
-					<select id="select" name="dates" style="width: 115px;" onchange="postDate('/ChatterReports/Report','DATE')"> 
+					<select id="select" name="dates" style="width: 115px;" onchange="postDate('/Report','DATE')"> 
 						
 						<% 							
 							Iterator<String> datesItererator = dates.iterator();
@@ -121,7 +121,7 @@
 				</td> 
 
 				<td width="10%">
-					<form method="GET" action="/ChatterReports/Report">
+					<form method="GET" action="/Report">
 						<INPUT type="submit" name="LOGOUT" value="LOGOUT"></INPUT>						
 					</form>
 				</td>

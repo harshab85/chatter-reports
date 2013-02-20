@@ -173,7 +173,7 @@ public class OAuthUserAuthenticator implements IAuthenticate {
 	/**
 	 * Constructs the Authorization URL
 	 */
-	protected String getAuthorizationURL(String code) throws UnsupportedEncodingException{
+	public String getAuthorizationURL(String code) throws UnsupportedEncodingException{
 		
 		StringBuilder authorizationUrl = new StringBuilder();
 		authorizationUrl.append(oAuthProperties.getAuthorizationURL());
@@ -206,7 +206,7 @@ public class OAuthUserAuthenticator implements IAuthenticate {
 	/**
 	 * Constructs the Authentication URL
 	 */
-	protected String getAuthenticationURL() throws UnsupportedEncodingException {
+	public String getAuthenticationURL() throws UnsupportedEncodingException {
 		
 		StringBuilder authenticationUrl = new StringBuilder();
 		authenticationUrl.append(oAuthProperties.getAuthenticationUrl());
