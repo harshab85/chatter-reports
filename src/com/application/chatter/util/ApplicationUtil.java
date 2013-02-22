@@ -27,7 +27,7 @@ import com.application.chatter.reports.MissingInputException;
 public final class ApplicationUtil {
 
 	public static final String JSP_PATH = "/WEB-INF/views/ChatterReporter.jsp";
-	public static final String PATH = "/Report";
+	//public static final String PATH = "/Report";
 	public static final String ERROR_PATH = "/WEB-INF/views/Error.jsp";
 	
 	/**

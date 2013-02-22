@@ -59,7 +59,7 @@
 		URL thumbnail = null;
 		Map<String, List<Feed>> userFeeds = null;
 		Set<String> dates = null;
-		String selectedDate = null;
+		String selectedDate = "";
 		
 		ChatterFeedsReport feedsReport = (ChatterFeedsReport)request.getAttribute(SessionBeanKeys.FEEDSREPORT.getKey());
 		
@@ -75,7 +75,7 @@
 		selectedDate = (String)request.getAttribute(SessionBeanKeys.DATE.getKey());
 		dates = userFeeds.keySet();
 				
-		if(selectedDate == null || selectedDate.isEmpty()){
+		if((selectedDate == null || selectedDate.isEmpty()) && (dates != null && !dates.isEmpty())){
 			selectedDate  = dates.iterator().next();			
 		}
 			
@@ -133,7 +133,7 @@
 		<table width="100%">
 			<tr style="background-color:#629edc;font-size:20px">
 				<td><b>Date</b></td>
-				<td><b>Posts (Total: <%out.print(feedList.size()); %>)</b></td>
+				<td><b>Posts (Total: <% if(feedList != null) out.print(feedList.size()); %>)</b></td>
 				<td><b>Type</b></td>
 				<td><b>N Likes </b></td>
 				<td><b>N Comments</b></td>				

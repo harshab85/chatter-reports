@@ -88,64 +88,120 @@ public class SimpleFeeds implements IFeeds {
 		
 		Map<String, List<Feed>> feeds = new LinkedHashMap<String, List<Feed>>();
 		
-		JSONArray items = (JSONArray)json.get(UserFeedsKeys.ITEMS.getKey());
+		Object jaItems = json.get(UserFeedsKeys.ITEMS.getKey());
 		
-		Iterator<JSONObject> iter = items.iterator();
-		while(iter.hasNext()){
-			JSONObject item = iter.next();			
-			JSONObject body = (JSONObject)item.get(UserFeedsKeys.BODY.getKey());
-			JSONArray messageSegments = (JSONArray)body.get(UserFeedsKeys.MESSAGESEGMENTS.getKey());
+		if(jaItems instanceof JSONArray){
+			
+			JSONArray items = (JSONArray)jaItems;
+			
+			Iterator<JSONObject> iter = items.iterator();
+			while(iter.hasNext()){
+				JSONObject item = iter.next();			
 				
-			Iterator<JSONObject> ms = messageSegments.iterator();
-			String type = null;
-			while(ms.hasNext()){
-				JSONObject segment = ms.next();
-				type = (String)segment.get(UserFeedsKeys.TYPE.getKey());
-				if(type != null){
-					break;
+				Object jBody = item.get(UserFeedsKeys.BODY.getKey());
+				if(jBody instanceof JSONObject){
+					JSONObject body = (JSONObject)jBody;
+					
+					JSONArray messageSegments = null;
+					Object jMessageSegments = body.get(UserFeedsKeys.MESSAGESEGMENTS.getKey());
+					if(jMessageSegments instanceof JSONArray){
+						messageSegments = (JSONArray)jMessageSegments;
+					}
+					
+					Object sType = null;
+					String type = null;
+					if(jMessageSegments != null){
+						Iterator<JSONObject> ms = messageSegments.iterator();					
+						while(ms.hasNext()){
+							JSONObject segment = ms.next();
+							sType = segment.get(UserFeedsKeys.TYPE.getKey());
+							if(sType instanceof String){
+								type = (String)sType;
+								break;
+							}
+						}
+					}
+											
+					Object sText = body.get(UserFeedsKeys.TEXT.getKey());
+					String post = "";
+					if(sText instanceof String){
+						post = (String)sText;
+					}
+					
+					Object sDate = item.get(UserFeedsKeys.CREATEDDATE.getKey());
+					String date = null;
+					if(sDate instanceof String){
+						date = (String)sDate;
+					}
+					
+					Object jComments = item.get(UserFeedsKeys.COMMENTS.getKey());
+					JSONObject comments = null;
+					if(jComments instanceof JSONObject){
+						comments = (JSONObject)jComments;
+					}
+					
+					Object lNumComments = comments.get(UserFeedsKeys.TOTAL.getKey());;
+					Long numComments = 0L;
+					if(lNumComments instanceof Long){
+						numComments = (Long)lNumComments;
+					}
+					
+					List<Feed> commentsList = createComments(comments);
+					
+					Object jLikes = item.get(UserFeedsKeys.LIKES.getKey());
+					JSONObject likes = null;
+					if(jLikes instanceof JSONObject){
+						likes = (JSONObject)jLikes;
+					}
+					
+					Long numLikes = 0L;
+					Object lNumLikes = likes.get(UserFeedsKeys.TOTAL.getKey());;
+					if(lNumLikes instanceof Long){
+						numLikes = (Long)lNumLikes;
+					}
+					
+					Date createdDate = null;
+					try {
+						Calendar calendar = DatatypeConverter.parseDateTime(date);
+						createdDate = calendar.getTime();
+					}
+					catch (IllegalArgumentException e) {
+						// TODO should log the error
+						// Cannot proceed without createdDate
+						continue;
+					}
+								
+					Feed feed = new Feed();
+					feed.setPost(post);
+					feed.setType(type);
+					feed.setCreationDate(createdDate);
+					feed.setNumComments(numComments);
+					feed.setLikes(numLikes);
+					feed.setComments(commentsList);										
+					createFullPost(feed);
+								
+					String dateKey = "";
+					try {
+						dateKey = UserInfoUtil.createUserFeedsDateKey(createdDate);
+					} 
+					catch (MissingInputException e) {
+						// TODO should log the error
+						// Cannot proceed without createdDate
+						continue;
+					}
+					
+					List<Feed> feedsList = feeds.get(dateKey);
+					if(feedsList == null){
+						feedsList = new ArrayList<Feed>();
+					}					
+					
+					feedsList.add(feed);
+					feeds.put(dateKey, feedsList);			
 				}
 			}
-											
-			String post = (String)body.get(UserFeedsKeys.TEXT.getKey());			
-			String date = (String)item.get(UserFeedsKeys.CREATEDDATE.getKey());
-														
-			JSONObject comments = (JSONObject)item.get(UserFeedsKeys.COMMENTS.getKey());
-			Long numComments = (Long)comments.get(UserFeedsKeys.TOTAL.getKey());
-			
-			List<Feed> commentsList = createComments(comments);
-			
-			JSONObject likes = (JSONObject)item.get(UserFeedsKeys.LIKES.getKey());
-			Long numLikes = (Long)likes.get(UserFeedsKeys.TOTAL.getKey());
-			
-			Calendar calendar = DatatypeConverter.parseDateTime(date);
-			Date createdDate = calendar.getTime();
-						
-			Feed feed = new Feed();
-			feed.setPost(post);
-			feed.setType(type);
-			feed.setCreationDate(createdDate);
-			feed.setNumComments(numComments);
-			feed.setLikes(numLikes);
-			feed.setComments(commentsList);
-								
-			createFullPost(feed);
-						
-			String dateKey = "";
-			try {
-				dateKey = UserInfoUtil.createUserFeedsDateKey(createdDate);
-			} 
-			catch (MissingInputException e) {
-				// TODO should log the error
-				continue;
-			}
-			List<Feed> feedsList = feeds.get(dateKey);
-			if(feedsList == null){
-				feedsList = new ArrayList<Feed>();
-			}
-			
-			feedsList.add(feed);
-			feeds.put(dateKey, feedsList);			
 		}
+		
+		
 		
 		return feeds;
 	}
@@ -169,33 +225,53 @@ public class SimpleFeeds implements IFeeds {
 		
 		List<Feed> feedsList = new ArrayList<Feed>();
 		
-		JSONArray commentsArray = (JSONArray)comments.get("comments");
+		Object jaComments = comments.get("comments");
+		JSONArray commentsArray = null;
+		if(jaComments instanceof JSONArray){
+			commentsArray = (JSONArray)comments.get("comments");
 		
-		Iterator<JSONObject> iter = commentsArray.iterator();
-		
-		while(iter.hasNext()){
-		
-			JSONObject json = iter.next();
+			Iterator<JSONObject> iter = commentsArray.iterator();
 			
-			JSONObject body = (JSONObject)json.get(UserFeedsKeys.BODY.getKey());		
-			String post = (String)body.get(UserFeedsKeys.TEXT.getKey());
+			while(iter.hasNext()){
 			
-			String date = (String)json.get(UserFeedsKeys.CREATEDDATE.getKey());
-			Calendar calendar = DatatypeConverter.parseDateTime(date);
-			Date createdDate = calendar.getTime();
-			
-			Feed feed = new Feed();
-			feed.setPost(post);
-			feed.setType("Comment");
-			feed.setCreationDate(createdDate);		
-			feed.setLikes(0L);
-			feed.setNumComments(0L);
-			
-			feedsList.add(feed);
+				JSONObject json = iter.next();
+				
+				Object jBody = json.get(UserFeedsKeys.BODY.getKey());
+				if(jBody instanceof JSONObject){
+					JSONObject body = (JSONObject)jBody;		
+					
+					Object sPost = body.get(UserFeedsKeys.TEXT.getKey());
+					String post = "";
+					if(sPost instanceof String){
+						post = (String)sPost;
+					}
+					
+					Object sDate = json.get(UserFeedsKeys.CREATEDDATE.getKey());
+					String date = "";
+					if(sDate instanceof String){
+						date = (String)sDate;
+					}
+					
+					Date createdDate = null;
+					try{
+						Calendar calendar = DatatypeConverter.parseDateTime(date);
+						createdDate = calendar.getTime();
+					}				
+					catch (IllegalArgumentException e) {
+						// TODO should log the error
+					}
+					
+					Feed feed = new Feed();
+					feed.setPost(post);
+					feed.setType("Comment");
+					feed.setCreationDate(createdDate);		
+					feed.setLikes(0L);
+					feed.setNumComments(0L);
+					
+					feedsList.add(feed);
+				}
+			}
 		}
-		
-		
-		
 		
 		return feedsList;
 	}
